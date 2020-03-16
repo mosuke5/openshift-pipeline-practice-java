@@ -90,8 +90,22 @@ pipeline {
         script {
           openshift.withCluster() {
             openshift.withProject("${deploy_project}") {
+              def app_name = 'pipeline-practice-java'
+
+              // Apply application manifests
               //sh "oc process -f openshift/templates/application-deploy.yaml -p APP_IMAGE=${app_image} APP_IMAGE_TAG=${env.GIT_COMMIT} | oc apply -n ${deploy_project} -f -"
-              openshift.apply(openshift.process('-f', 'openshift/application-deploy.yaml', '-p', "APP_IMAGE=${app_image}", "-p", "APP_IMAGE_TAG=${env.GIT_COMMIT}"))
+              openshift.apply(openshift.process('-f', 'openshift/application-deploy.yaml', '-p', "${app_name}", '-p', "APP_IMAGE=${app_image}", "-p", "APP_IMAGE_TAG=${env.GIT_COMMIT}"))
+
+              // Wait for application to be deployed
+              def dc = openshift.selector("dc", "${app_name}").object()
+              def dc_version = dc.status.latestVersion
+              def rc = openshift.selector("rc", "${app_name}-${dc_version}").object()
+
+              echo "Waiting for ReplicationController ${app_name}-${dc_version} to be ready"
+              while (rc.spec.replicas != rc.status.readyReplicas) {
+                sleep 5
+                rc = openshift.selector("rc", "${app_name}-${dc_version}").object()
+              }
             }
           }
         }
