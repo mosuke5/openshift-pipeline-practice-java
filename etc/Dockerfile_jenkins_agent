@@ -1,0 +1,4 @@
+FROM image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-maven
+USER root
+RUN yum install -y postgresql
+USER 1001

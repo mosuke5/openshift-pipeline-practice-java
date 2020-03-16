@@ -1,0 +1,248 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: sample-spring-boot
+labels:
+  template: sample-spring-boot
+  app: sample-spring-boot
+objects:
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  stringData:
+    database-user: "${DATABASE_USER}"
+    database-password: "${DATABASE_PASSWORD}"
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: "${NAME}"
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  spec:
+    host: "${APPLICATION_DOMAIN}"
+    to:
+      kind: Service
+      name: "${NAME}"
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  spec:
+    strategy:
+    type: Recreate
+    triggers:
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "${NAME}"
+    template:
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        containers:
+        - name: sample-spring-boot
+          image: "${APP_IMAGE}:${APP_IMAGE_TAG}"
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 3
+            httpGet:
+              path: "/health"
+              port: 8080
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: "/health"
+              port: 8080
+          env:
+          - name: PG_HOST
+            value: "postgresql"
+          - name: PG_DB
+            value: "${DATABASE_NAME}"
+          - name: PG_USER
+            valueFrom:
+              secretKeyRef:
+                name: "${NAME}"
+                key: database-user
+          - name: PG_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "${NAME}"
+                key: database-password
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT}"
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: "postgresql"
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${VOLUME_CAPACITY}"
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "postgresql"
+    annotations:
+      description: Exposes the database server
+  spec:
+    ports:
+    - name: postgresql
+      port: 5432
+      targetPort: 5432
+    selector:
+      name: "postgresql"
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "postgresql"
+    annotations:
+      description: Defines how to deploy the database
+      template.alpha.openshift.io/wait-for-ready: 'true'
+  spec:
+    strategy:
+      type: Recreate
+      recreateParams:
+        post:
+          execNewPod:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "sleep 10 && curl https://raw.githubusercontent.com/mosuke5/cnd-freelance-service/master/etc/testdata.sql -o testdata.sql && PGPASSWORD=password psql -U freelancer -d freelancerdb -h $POSTGRESQL_SERVICE_HOST -f testdata.sql"
+            containerName: postgresql
+          failurePolicy: Abort
+        timeoutSeconds: 600
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - postgresql
+        from:
+          kind: ImageStreamTag
+          namespace: "${NAMESPACE}"
+          name: postgresql:${POSTGRESQL_VERSION}
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "postgresql"
+    template:
+      metadata:
+        name: "postgresql"
+        labels:
+          name: "postgresql"
+      spec:
+        volumes:
+        - name: "postgresql-data"
+          persistentVolumeClaim:
+            claimName: "postgresql"
+        containers:
+        - name: postgresql
+          image: " "
+          ports:
+          - containerPort: 5432
+          env:
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: "${NAME}"
+                key: database-user
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "${NAME}"
+                key: database-password
+          - name: POSTGRESQL_DATABASE
+            value: "${DATABASE_NAME}"
+          volumeMounts:
+          - name: "postgresql-data"
+            mountPath: "/var/lib/pgsql/data"
+          readinessProbe:
+            timeoutSeconds: 1
+            initialDelaySeconds: 5
+            exec:
+              command:
+              - "/usr/libexec/check-container"
+          livenessProbe:
+            timeoutSeconds: 10
+            initialDelaySeconds: 120
+            exec:
+              command:
+              - "/usr/libexec/check-container"
+              - "--live"
+          resources:
+            limits:
+              memory: "${MEMORY_POSTGRESQL_LIMIT}"
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: sample-spring-boot
+- name: NAMESPACE
+  displayName: Namespace
+  required: true
+  description: The OpenShift Namespace where the ImageStream resides.
+  value: openshift
+- name: APP_IMAGE
+  displayName: Application Image
+  required: true
+  value: image-registry.openshift-image-registry.svc:5000/app-development/sample-spring-boot
+- name: APP_IMAGE_TAG
+  displayName: Application Image Tag
+  required: true
+  value: latest
+- name: POSTGRESQL_VERSION
+  displayName: Version of PostgreSQL Image
+  description: Version of PostgreSQL image to be used (10 or latest).
+  value: '10'
+  required: true
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  required: true
+  description: Maximum amount of memory the Django container can use.
+  value: 512Mi
+- name: MEMORY_POSTGRESQL_LIMIT
+  displayName: Memory Limit (PostgreSQL)
+  required: true
+  description: Maximum amount of memory the PostgreSQL container can use.
+  value: 512Mi
+- name: VOLUME_CAPACITY
+  displayName: Volume Capacity
+  description: Volume space available for data, e.g. 512Mi, 2Gi
+  value: 1Gi
+  required: true
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the Django service, if left
+    blank a value will be defaulted.
+  value: ''
+- name: DATABASE_NAME
+  displayName: Database Name
+  required: true
+  value: freelancerdb
+- name: DATABASE_USER
+  displayName: Database Username
+  required: true
+  value: freelancer
+- name: DATABASE_PASSWORD
+  displayName: Database User Password
+  value: password

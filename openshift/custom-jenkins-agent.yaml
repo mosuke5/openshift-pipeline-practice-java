@@ -1,0 +1,51 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: "${NAME}-template"
+labels:
+  template: "${NAME}-template"
+  app: "${NAME}"
+objects:
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    name: "${NAME}"
+    labels:
+      name: "${NAME}"
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}:latest"
+    resources: {}
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: "${DOCKERFILE_PATH}"
+    source:
+      type: Git
+      git:
+        uri: "${SOURCE_REPOSITORY_URL}"
+        ref: "${SOURCE_REPOSITORY_REF}"
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+parameters:
+- name: NAME
+  displayName: Name
+  required: true
+  value: custom-jenkins-agent-maven
+- name: DOCKERFILE_PATH
+  displayName: Dockerfile path
+  required: true
+  value: etc/Dockerfile_jenkins_agent
+- name: SOURCE_REPOSITORY_URL
+  displayName: Git Repository URL
+  required: true
+  value: https://github.com/mosuke5/cnd-freelance-service.git
+- name: SOURCE_REPOSITORY_REF
+  displayName: Git Reference
+  required: true
+  value: pipeline-dev

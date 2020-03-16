@@ -1,0 +1,58 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: sample-spring-boot
+labels:
+  template: sample-spring-boot
+  app: sample-spring-boot
+objects:
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    name: "${NAME}"
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}:latest"
+    strategy:
+      type: Source
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          namespace: "${NAMESPACE}"
+          name: 'redhat-openjdk18-openshift:1.2'
+    source:
+      type: binary
+      #type: Git
+      #git:
+      #  uri: "${SOURCE_REPOSITORY_URL}"
+      #  ref: "${SOURCE_REPOSITORY_REF}"
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Keeps track of changes in the application image
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: sample-spring-boot
+- name: NAMESPACE
+  displayName: Namespace
+  required: true
+  description: The OpenShift Namespace where the ImageStream resides.
+  value: openshift
+- name: SOURCE_REPOSITORY_URL
+  displayName: Git Repository URL
+  required: true
+  description: The URL of the repository with your application source code.
+  value: https://github.com/mosuke5/cnd-freelance-service.git
+- name: SOURCE_REPOSITORY_REF
+  displayName: Git Reference
+  required: true
+  description: Set this to a branch name, tag or other ref of your repository if you are not using the default branch.
+  value: master
