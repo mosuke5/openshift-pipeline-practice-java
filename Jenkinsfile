@@ -1,8 +1,8 @@
 #!groovy
 def deploy_branch = "origin/master"
 def deploy_project = "app-development"
-def build_config_name = "freelancer-build"
-def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${build_config_name}"
+def app_name = 'pipeline-practice-java'
+def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
 
 pipeline {
   // pipelineを実行するagentの設定。yamlファイルで設定を渡せる
@@ -25,6 +25,7 @@ pipeline {
       steps {
 				sh 'java -version'
 				sh 'mvn -v'
+				sh 'mvn clean package -DskipTests'
       }
     }
 
@@ -33,22 +34,16 @@ pipeline {
         stage('Code analysis') {
           steps {
             echo "Exec static analysis"
-            sh 'PGPASSWORD=password psql -U freelancer -d freelancerdb_test -h localhost -f etc/testdata.sql'
-            sh 'mvn clean test'
           }
         }
 
         stage('unit test') {
           steps {
             echo "Exec unit test"
+            sh 'PGPASSWORD=password psql -U freelancer -d freelancerdb_test -h localhost -f etc/testdata.sql'
+            sh 'mvn test'
           }
         }
-      }
-    }
-
-    stage('build') {
-      steps {
-				sh 'mvn clean package -DskipTests'
       }
     }
 
@@ -66,11 +61,11 @@ pipeline {
             openshift.withProject("${deploy_project}") {
               // update build config
               //sh "oc process -f openshift/templates/application-build.yaml | oc apply -n ${deploy_project} -f -"
-              openshift.apply(openshift.process('-f', 'openshift/application-build.yaml', '-p', "NAME=${build_config_name}"))
+              openshift.apply(openshift.process('-f', 'openshift/application-build.yaml', '-p', "NAME=${app_name}"))
 
-              openshift.selector("bc", "${build_config_name}").startBuild("--from-file=./target/freelancer-service.jar", "--wait=true")
-              //openshift.selector("bc", "${build_config_name}").startBuild("--wait=true")
-              openshift.tag("${build_config_name}:latest", "${build_config_name}:${env.GIT_COMMIT}")
+              openshift.selector("bc", "${app_name}").startBuild("--from-file=./target/freelancer-service.jar", "--wait=true")
+              //openshift.selector("bc", "${app_name}").startBuild("--wait=true")
+              openshift.tag("${app_name}:latest", "${app_name}:${env.GIT_COMMIT}")
             }
           }
         }
@@ -90,11 +85,9 @@ pipeline {
         script {
           openshift.withCluster() {
             openshift.withProject("${deploy_project}") {
-              def app_name = 'pipeline-practice-java'
-
               // Apply application manifests
               //sh "oc process -f openshift/templates/application-deploy.yaml -p APP_IMAGE=${app_image} APP_IMAGE_TAG=${env.GIT_COMMIT} | oc apply -n ${deploy_project} -f -"
-              openshift.apply(openshift.process('-f', 'openshift/application-deploy.yaml', '-p', "${app_name}", '-p', "APP_IMAGE=${app_image}", "-p", "APP_IMAGE_TAG=${env.GIT_COMMIT}"))
+              openshift.apply(openshift.process('-f', 'openshift/application-deploy.yaml', '-p', "NAME=${app_name}", '-p', "APP_IMAGE=${app_image}", "-p", "APP_IMAGE_TAG=${env.GIT_COMMIT}"))
 
               // Wait for application to be deployed
               def dc = openshift.selector("dc", "${app_name}").object()
