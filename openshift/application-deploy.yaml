@@ -40,7 +40,7 @@ objects:
     name: "${NAME}"
   spec:
     strategy:
-    type: Recreate
+    type: Rolling
     triggers:
     - type: ConfigChange
     replicas: 1
@@ -126,7 +126,7 @@ objects:
             command:
             - "/bin/bash"
             - "-c"
-            - "sleep 10 && curl https://raw.githubusercontent.com/mosuke5/cnd-freelance-service/master/etc/testdata.sql -o testdata.sql && PGPASSWORD=password psql -U freelancer -d freelancerdb -h $POSTGRESQL_SERVICE_HOST -f testdata.sql"
+            - "sleep 10 && curl https://raw.githubusercontent.com/mosuke5/openshift-pipeline-practice-java/master/etc/testdata.sql -o testdata.sql && PGPASSWORD=password psql -U freelancer -d freelancerdb -h $POSTGRESQL_SERVICE_HOST -f testdata.sql"
             containerName: postgresql
           failurePolicy: Abort
         timeoutSeconds: 600

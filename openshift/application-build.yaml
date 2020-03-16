@@ -50,7 +50,7 @@ parameters:
   displayName: Git Repository URL
   required: true
   description: The URL of the repository with your application source code.
-  value: https://github.com/mosuke5/cnd-freelance-service.git
+  value: https://github.com/mosuke5/openshift-pipeline-practice-java.git
 - name: SOURCE_REPOSITORY_REF
   displayName: Git Reference
   required: true
