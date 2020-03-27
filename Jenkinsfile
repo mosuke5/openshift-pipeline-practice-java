@@ -2,6 +2,7 @@
 def dev_branch = "origin/test-dev"
 def uat_branch = "origin/test-uat"
 def deploy_branch = "origin/test"
+def dev_project = "mosuke5-dev"
 def uat_project = "mosuke5-uat"
 def deploy_project = "mosuke5-prod"
 def app_name = 'pipeline-practice-java'
