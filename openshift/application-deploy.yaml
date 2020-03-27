@@ -209,7 +209,7 @@ parameters:
 - name: APP_IMAGE_TAG
   displayName: Application Image Tag
   required: true
-  value: latest
+  value: 14bc83bee5840a2a7fa99b43f19d699556389e14
 - name: POSTGRESQL_VERSION
   displayName: Version of PostgreSQL Image
   description: Version of PostgreSQL image to be used (10 or latest).
