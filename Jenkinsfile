@@ -21,6 +21,13 @@ pipeline {
 
   stages {
     stage('Checkout Source') {
+      steps {
+        scmSkip(deleteBuild: true)
+        checkout scm
+      }
+    }
+
+    stage('Setup') {
       when {
         expression {
           return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
@@ -28,7 +35,6 @@ pipeline {
       }
 
       steps {
-        checkout scm
 				sh 'java -version'
 				sh 'mvn -v'
 				sh 'mvn clean package -DskipTests'
