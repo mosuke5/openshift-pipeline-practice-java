@@ -1,5 +1,5 @@
 #!groovy
-def deploy_branch = "origin/master"
+def deploy_branch = "origin/test"
 def deploy_project = "mosuke5-dev"
 def app_name = 'pipeline-practice-java'
 def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
