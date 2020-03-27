@@ -6,7 +6,8 @@ def dev_project = "mosuke5-dev"
 def uat_project = "mosuke5-uat"
 def deploy_project = "mosuke5-prod"
 def app_name = 'pipeline-practice-java'
-def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
+def local_registry_path = "image-registry.openshift-image-registry.svc:5000"
+def app_image = "${local_registry_path}/${dev_project}/${app_name}"
 
 pipeline {
   // pipelineを実行するagentの設定。yamlファイルで設定を渡せる
