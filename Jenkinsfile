@@ -18,20 +18,15 @@ pipeline {
   }
 
   stages {
-    when {
-      expression {
-        return env.GIT_BRANCH != "${deploy_branch}" || env.GIT_BRANCH != "${uat_branch}" ||params.FORCE_FULL_BUILD
-      }
-    }
-
     stage('Checkout Source') {
+      when {
+        expression {
+          return env.GIT_BRANCH != "${deploy_branch}" || env.GIT_BRANCH != "${uat_branch}" ||params.FORCE_FULL_BUILD
+        }
+      }
+
       steps {
         checkout scm
-      }
-    }
-
-    stage('Setup') {
-      steps {
 				sh 'java -version'
 				sh 'mvn -v'
 				sh 'mvn clean package -DskipTests'
@@ -39,6 +34,12 @@ pipeline {
     }
 
     stage('application test') {
+      when {
+        expression {
+          return env.GIT_BRANCH != "${deploy_branch}" || env.GIT_BRANCH != "${uat_branch}" ||params.FORCE_FULL_BUILD
+        }
+      }
+
       parallel {
         stage('Code analysis') {
           steps {
@@ -55,16 +56,14 @@ pipeline {
         }
       }
     }
-  }
-
-  stages {
-    when {
-      expression {
-        return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
-      }
-    }
 
     stage('Build and Tag OpenShift Image') {
+      when {
+        expression {
+          return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
+        }
+      }
+
       steps {
         echo "Building OpenShift container image"
         script {
@@ -84,6 +83,12 @@ pipeline {
     }
 
     stage('deploy to dev') {
+      when {
+        expression {
+          return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
+        }
+      }
+
       steps {
         echo "deploy"
         script {
@@ -108,16 +113,14 @@ pipeline {
         }
       }
     }
-  }
-
-  stages {
-    when {
-      expression {
-        return env.GIT_BRANCH == "${uat_branch}" || params.FORCE_FULL_BUILD
-      }
-    }
 
     stage('deploy to uat') {
+      when {
+        expression {
+          return env.GIT_BRANCH == "${uat_branch}" || params.FORCE_FULL_BUILD
+        }
+      }
+
       steps {
         echo "deploy"
         script {
