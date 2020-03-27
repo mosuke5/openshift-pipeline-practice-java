@@ -205,7 +205,7 @@ parameters:
 - name: APP_IMAGE
   displayName: Application Image
   required: true
-  value: image-registry.openshift-image-registry.svc:5000/app-development/sample-spring-boot
+  value: image-registry.openshift-image-registry.svc:5000/mosuke5-dev/sample-spring-boot
 - name: APP_IMAGE_TAG
   displayName: Application Image Tag
   required: true
