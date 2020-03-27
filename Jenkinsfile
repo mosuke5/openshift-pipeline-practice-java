@@ -23,7 +23,7 @@ pipeline {
     stage('Checkout Source') {
       when {
         expression {
-          return env.GIT_BRANCH != "${deploy_branch}" || env.GIT_BRANCH != "${uat_branch}" ||params.FORCE_FULL_BUILD
+          return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
         }
       }
 
@@ -38,7 +38,7 @@ pipeline {
     stage('application test') {
       when {
         expression {
-          return env.GIT_BRANCH != "${deploy_branch}" || env.GIT_BRANCH != "${uat_branch}" ||params.FORCE_FULL_BUILD
+          return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
         }
       }
 
