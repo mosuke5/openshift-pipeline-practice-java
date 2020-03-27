@@ -1,6 +1,9 @@
 #!groovy
+def dev_branch = "origin/test-dev"
+def uat_branch = "origin/test-uat"
 def deploy_branch = "origin/test"
-def deploy_project = "mosuke5-dev"
+def uat_project = "mosuke5-uat"
+def deploy_project = "mosuke5-prod"
 def app_name = 'pipeline-practice-java'
 def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
 
@@ -15,6 +18,12 @@ pipeline {
   }
 
   stages {
+    when {
+      expression {
+        return env.GIT_BRANCH != "${deploy_branch}" || env.GIT_BRANCH != "${uat_branch}" ||params.FORCE_FULL_BUILD
+      }
+    }
+
     stage('Checkout Source') {
       steps {
         checkout scm
@@ -46,19 +55,21 @@ pipeline {
         }
       }
     }
+  }
+
+  stages {
+    when {
+      expression {
+        return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
+      }
+    }
 
     stage('Build and Tag OpenShift Image') {
-      when {
-        expression {
-          return env.GIT_BRANCH == "${deploy_branch}" || params.FORCE_FULL_BUILD
-        }
-      }
-
       steps {
         echo "Building OpenShift container image"
         script {
           openshift.withCluster() {
-            openshift.withProject("${deploy_project}") {
+            openshift.withProject("${dev_project}") {
               // update build config
               //sh "oc process -f openshift/templates/application-build.yaml | oc apply -n ${deploy_project} -f -"
               openshift.apply(openshift.process('-f', 'openshift/application-build.yaml', '-p', "NAME=${app_name}"))
@@ -70,24 +81,51 @@ pipeline {
           }
         }
       }
-
     }
 
-    stage('deploy') {
-      when {
-        expression {
-          return env.GIT_BRANCH == "${deploy_branch}" || params.FORCE_FULL_BUILD
-        }
-      }
-
+    stage('deploy to dev') {
       steps {
         echo "deploy"
         script {
           openshift.withCluster() {
-            openshift.withProject("${deploy_project}") {
+            openshift.withProject("${dev_project}") {
               // Apply application manifests
               //sh "oc process -f openshift/templates/application-deploy.yaml -p APP_IMAGE=${app_image} APP_IMAGE_TAG=${env.GIT_COMMIT} | oc apply -n ${deploy_project} -f -"
               openshift.apply(openshift.process('-f', 'openshift/application-deploy.yaml', '-p', "NAME=${app_name}", '-p', "APP_IMAGE=${app_image}", "-p", "APP_IMAGE_TAG=${env.GIT_COMMIT}"))
+
+              // Wait for application to be deployed
+              def dc = openshift.selector("dc", "${app_name}").object()
+              def dc_version = dc.status.latestVersion
+              def rc = openshift.selector("rc", "${app_name}-${dc_version}").object()
+
+              echo "Waiting for ReplicationController ${app_name}-${dc_version} to be ready"
+              while (rc.spec.replicas != rc.status.readyReplicas) {
+                sleep 5
+                rc = openshift.selector("rc", "${app_name}-${dc_version}").object()
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  stages {
+    when {
+      expression {
+        return env.GIT_BRANCH == "${uat_branch}" || params.FORCE_FULL_BUILD
+      }
+    }
+
+    stage('deploy to uat') {
+      steps {
+        echo "deploy"
+        script {
+          openshift.withCluster() {
+            openshift.withProject("${uat_project}") {
+              // Apply application manifests
+              //sh "oc process -f openshift/templates/application-deploy.yaml -p APP_IMAGE=${app_image} APP_IMAGE_TAG=${env.GIT_COMMIT} | oc apply -n ${deploy_project} -f -"
+              openshift.apply(openshift.process('-f', 'openshift/application-deploy.yaml', '-p', "NAME=${app_name}", '-p', "APP_IMAGE=${app_image}"))
 
               // Wait for application to be deployed
               def dc = openshift.selector("dc", "${app_name}").object()
