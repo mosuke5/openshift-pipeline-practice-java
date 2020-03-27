@@ -14,6 +14,9 @@ spec:
         limits:
           cpu: 200m
           memory: 1024Mi
+      env:
+        - name: JAVA_HOME
+          value: "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.el7_7.x86_64/"
     - name: postgres
       image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:10
       tty: false
