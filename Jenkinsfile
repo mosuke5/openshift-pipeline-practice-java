@@ -23,7 +23,7 @@ pipeline {
     stage('Checkout Source') {
       steps {
         scmSkip(deleteBuild: false)
-        checkout scm
+        //checkout scm
       }
     }
 
