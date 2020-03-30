@@ -1,5 +1,6 @@
 Pipeline practice sample. 
 Implementation: Spring Boot, PostgreSQL
+test
 
 ## How to develop on local device
 ```
