@@ -20,14 +20,13 @@ pipeline {
   }
 
   stages {
-    stage('Checkout Source') {
+    stage('Setup') {
       steps {
-        scmSkip(deleteBuild: false)
-        //checkout scm
+        scmSkip(deleteBuild: true)
       }
     }
 
-    stage('Setup') {
+    stage('Build package') {
       when {
         expression {
           return env.GIT_BRANCH == "${dev_branch}" || params.FORCE_FULL_BUILD
