@@ -1,4 +1,4 @@
-Pipeline practice sample. Hello.
+Pipeline practice sample. Hello Nagasaki.
 Implementation: Spring Boot, PostgreSQL
 
 ## How to develop on local device
