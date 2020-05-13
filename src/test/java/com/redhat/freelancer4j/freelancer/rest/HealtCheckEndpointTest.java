@@ -31,4 +31,8 @@ public class HealtCheckEndpointTest {
         given().get("/health").then().assertThat().statusCode(200).body("status", equalTo("UP"));
     }
 
+    @Test
+    public void invokeHello() throws Exception {
+        given().get("/hello").then().assertThat().statusCode(200).body("hello", equalTo("world"));
+    }
 }
