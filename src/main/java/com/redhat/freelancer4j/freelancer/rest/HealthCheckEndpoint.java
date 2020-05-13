@@ -31,7 +31,7 @@ public class HealthCheckEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> getHello() {
         HashMap<String, String> map = new HashMap<>();
-        map.put("hello", "world!");
+        map.put("hello", "world");
         map.put("foo", "bar");
         return map;
     }
