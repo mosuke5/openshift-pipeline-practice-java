@@ -152,8 +152,9 @@ objects:
       spec:
         volumes:
         - name: "postgresql-data"
-          persistentVolumeClaim:
-            claimName: "postgresql"
+          emptyDir: {}
+          #persistentVolumeClaim:
+          #  claimName: "postgresql"
         containers:
         - name: postgresql
           image: " "
