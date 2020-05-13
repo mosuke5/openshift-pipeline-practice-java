@@ -123,7 +123,7 @@ pipeline {
               echo "${url}"
               while (true) {
                 sleep 5
-                def app_status = sh(returnStdout: true, script: "curl ${url} -o /dev/null -w '%{http_code}' -s").trim()
+                def app_status = sh(returnStdout: true, script: "curl ${url}/hello -o /dev/null -w '%{http_code}' -s").trim()
                 if(app_status == "200") {
                   break;
                 }
