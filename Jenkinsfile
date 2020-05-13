@@ -121,13 +121,13 @@ pipeline {
               def dc = openshift.selector("route", "${app_name}").object()
               def url = dc.spec.host
               echo "${url}"
-            }
-          }
-          while (true) {
-            sleep 5
-            def app_status = sh(returnStdout: true, script: "curl ${url} -o /dev/null -w '%{http_code}' -s").trim()
-            if(app_status == "200") {
-              break;
+              while (true) {
+                sleep 5
+                def app_status = sh(returnStdout: true, script: "curl ${url} -o /dev/null -w '%{http_code}' -s").trim()
+                if(app_status == "200") {
+                  break;
+                }
+              }
             }
           }
         }
