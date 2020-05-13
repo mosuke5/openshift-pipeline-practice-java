@@ -126,7 +126,7 @@ objects:
             command:
             - "/bin/bash"
             - "-c"
-            - "sleep 10 && curl https://raw.githubusercontent.com/mosuke5/openshift-pipeline-practice-java/master/etc/testdata.sql -o testdata.sql && PGPASSWORD=password psql -U freelancer -d freelancerdb -h $POSTGRESQL_SERVICE_HOST -f testdata.sql"
+            - "sleep 10 && curl https://raw.githubusercontent.com/mosuke5/openshift-pipeline-practice-java/master/etc/testdata.sql -o /tmp/testdata.sql && PGPASSWORD=password psql -U freelancer -d freelancerdb -h $POSTGRESQL_SERVICE_HOST -f /tmp/testdata.sql"
             containerName: postgresql
           failurePolicy: Abort
         timeoutSeconds: 600
