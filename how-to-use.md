@@ -61,6 +61,31 @@ URLは`https://xxxxxxxxxxxx/health` or `https://xxxxxxxxxxxx/freelancers`
 - Jenkins agent
 
 ## アプリケーションに変更を加える
+### テストを落としてみる
+現状のサンプルアプリケーションでは`/hello`は`"hello": "world"`を含むAPIを返すことがテストとして書かれています。
+`src/main/java/com/redhat/freelancer4j/freelancer/rest/HealthCheckEndpoint.java`の34行目の `map.put("hello", "world");` を任意の文字列に変更してみよう。
+
+```java
+    @GET
+    @Path("/hello")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, String> getHello() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("hello", "world!!!!!");
+        map.put("foo", "bar");
+        return map;
+    }
+```
+
+### テストを変更してデプロイする
+`src/test/java/com/redhat/freelancer4j/freelancer/rest/HealtCheckEndpointTest.java`のテストを変更して変更をデプロイしてみます。
+
+```java
+    @Test
+    public void invokeHello() throws Exception {
+        given().get("/hello").then().assertThat().statusCode(200).body("hello", equalTo("world!!!!!"));
+    }
+```
 
 ## パイプラインに処理を追加する
-
+todo
