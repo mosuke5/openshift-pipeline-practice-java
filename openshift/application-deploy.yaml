@@ -87,16 +87,16 @@ objects:
           resources:
             limits:
               memory: "${MEMORY_LIMIT}"
-- kind: PersistentVolumeClaim
-  apiVersion: v1
-  metadata:
-    name: "postgresql"
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: "${VOLUME_CAPACITY}"
+#- kind: PersistentVolumeClaim
+#  apiVersion: v1
+#  metadata:
+#    name: "postgresql"
+#  spec:
+#    accessModes:
+#    - ReadWriteOnce
+#    resources:
+#      requests:
+#        storage: "${VOLUME_CAPACITY}"
 - kind: Service
   apiVersion: v1
   metadata:
@@ -190,8 +190,12 @@ objects:
               - "/usr/libexec/check-container"
               - "--live"
           resources:
+            requests:
+              cpu: 100m
+              memory: "${MEMORY_POSTGRESQL}"
             limits:
-              memory: "${MEMORY_POSTGRESQL_LIMIT}"
+              cpu: 100m
+              memory: "${MEMORY_POSTGRESQL}"
 parameters:
 - name: NAME
   displayName: Name
@@ -221,11 +225,11 @@ parameters:
   required: true
   description: Maximum amount of memory the Django container can use.
   value: 512Mi
-- name: MEMORY_POSTGRESQL_LIMIT
+- name: MEMORY_POSTGRESQL
   displayName: Memory Limit (PostgreSQL)
   required: true
   description: Maximum amount of memory the PostgreSQL container can use.
-  value: 512Mi
+  value: 256Mi
 - name: VOLUME_CAPACITY
   displayName: Volume Capacity
   description: Volume space available for data, e.g. 512Mi, 2Gi
