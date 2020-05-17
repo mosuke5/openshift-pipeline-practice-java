@@ -1,6 +1,6 @@
 #!groovy
 def deploy_branch = "origin/20200518"
-def deploy_project = "userX-development"
+def deploy_project = "userxx-development"
 def app_name = 'pipeline-practice-java'
 def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
 
