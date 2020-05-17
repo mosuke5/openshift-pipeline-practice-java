@@ -28,6 +28,7 @@ pipeline {
         stage('Code analysis') {
           steps {
             echo "Exec static analysis"
+            sh 'mvn spotbugs:check'
           }
         }
 
