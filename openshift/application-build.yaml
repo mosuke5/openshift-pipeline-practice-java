@@ -12,6 +12,13 @@ objects:
   metadata:
     name: "${NAME}"
   spec:
+    resources:
+      limits:
+        cpu: "300m" 
+        memory: "512Mi"
+      requests:
+        cpu: "300m" 
+        memory: "512Mi"
     output:
       to:
         kind: ImageStreamTag

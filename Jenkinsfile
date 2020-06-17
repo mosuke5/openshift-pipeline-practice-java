@@ -1,6 +1,6 @@
 #!groovy
 def deploy_branch = "origin/master"
-def deploy_project = "app-development"
+def deploy_project = "userxx-development"
 def app_name = 'pipeline-practice-java'
 def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
 
@@ -15,17 +15,11 @@ pipeline {
   }
 
   stages {
-    stage('Checkout Source') {
-      steps {
-        checkout scm
-      }
-    }
-
     stage('Setup') {
       steps {
-				sh 'java -version'
-				sh 'mvn -v'
-				sh 'mvn clean package -DskipTests'
+        sh 'java -version'
+        sh 'mvn -v'
+        sh 'mvn clean package -DskipTests'
       }
     }
 
@@ -34,6 +28,7 @@ pipeline {
         stage('Code analysis') {
           steps {
             echo "Exec static analysis"
+            //sh 'mvn spotbugs:check'
           }
         }
 
@@ -102,6 +97,19 @@ pipeline {
             }
           }
         }
+      }
+    }
+
+    stage('integration-test') {
+      when {
+        expression {
+          return env.GIT_BRANCH == "${deploy_branch}" || params.FORCE_FULL_BUILD
+        }
+      }
+
+      steps {
+        echo "integration-test"
+        // TODO
       }
     }
   }
