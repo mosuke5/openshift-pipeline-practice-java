@@ -4,7 +4,7 @@ spec:
   serviceAccountName: jenkins
   containers:
     - name: jnlp
-      image: image-registry.openshift-image-registry.svc:5000/platform-operation/custom-jenkins-agent
+      image: image-registry.openshift-image-registry.svc:5000/user1-operation/custom-jenkins-agent
       args: ['$(JENKINS_SECRET)', '$(JENKINS_NAME)']
       tty: false
       env:
