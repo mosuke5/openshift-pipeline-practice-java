@@ -1,6 +1,8 @@
 Pipeline practice sample.  
 Implementation: Spring Boot, PostgreSQL
 
+![overview](images/freelancer-overview.png)
+
 ## How to develop on local device
 ```
 // Start PostgreSQL with Docker
