@@ -1,9 +1,3 @@
-#!groovy
-def deploy_branch = "origin/master"
-def deploy_project = "userxx-development"
-def app_name = 'pipeline-practice-java'
-def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
-
 pipeline {
   // pipelineを実行するagentの設定。yamlファイルで設定を渡せる
   // 可能な限りJenkinsfileにagentの設定をもたせたほうが自動化とGit管理が進むためおすすめ。
@@ -12,6 +6,13 @@ pipeline {
       cloud 'openshift'
       yamlFile 'openshift/jenkins-slave-pod.yaml'
     }
+  }
+
+  environment {
+    deploy_branch = "origin/master"
+    deploy_project = "userxx-development"
+    app_name = 'pipeline-practice-java'
+    app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
   }
 
   stages {
