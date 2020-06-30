@@ -25,6 +25,7 @@ pipeline {
         sh 'java -version'
         sh 'mvn -v'
         //sh 'mvn clean package -DskipTests'
+        sh 'env'
         sh 'echo ${deploy_dir}'
       }
     }
