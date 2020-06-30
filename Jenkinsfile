@@ -1,7 +1,3 @@
-def deploy_branch = "origin/master"
-def deploy_project = "userxx-development"
-def app_name = 'pipeline-practice-java'
-def app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
 
 pipeline {
   // pipelineを実行するagentの設定。yamlファイルで設定を渡せる
@@ -17,6 +13,10 @@ pipeline {
     work_dir='/home/jenkins/work'
     bundle='/home/jenkins/bin/bundle'
     deploy_dir='/home/jenkins/deploy'
+    deploy_branch = "origin/modify-jenkinsfile"
+    deploy_project = "userxx-development"
+    app_name = 'pipeline-practice-java'
+    app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
   }
 
   stages {
@@ -26,6 +26,17 @@ pipeline {
         sh 'mvn -v'
         //sh 'mvn clean package -DskipTests'
         sh 'env'
+        sh 'echo ${deploy_dir}'
+      }
+    }
+
+    stage('Hoge') {
+      when {
+        expression {
+          return env.GIT_BRANCH == "${deploy_branch}" || params.FORCE_FULL_BUILD
+        }
+      }
+      steps {
         sh 'echo ${deploy_dir}'
       }
     }
