@@ -1,4 +1,3 @@
-#!groovy
 def deploy_branch = "origin/master"
 def deploy_project = "userxx-development"
 def app_name = 'pipeline-practice-java'
