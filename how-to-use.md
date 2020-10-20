@@ -26,6 +26,23 @@ $ oc policy add-role-to-user edit system:serviceaccount:app-devops:jenkins -n ap
 clusterrole.rbac.authorization.k8s.io/edit added: "system:serviceaccount:app-devops:jenkins"
 ```
 
+なお、上記の設定でもJenkinsの動作が重い場合は、DeploymentConfigを編集して、リソースの割り当てを変更できる。
+```
+oc edit deploymentconfigs.apps.openshift.io jenkins
+```
+```
+(設定例)
+...
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 4Gi
+...
+```
+
 ## Slave imageの作成
 Jenkinsパイプラインを実際に動作させるJenkins slaveのイメージを作成する。
 `jenkins-agent-maven`をベースとしながら、テストに必要なpostgresqlのクライアントをインストールしたJenkins Slaveを作成する。
