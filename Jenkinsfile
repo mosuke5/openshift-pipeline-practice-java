@@ -13,13 +13,17 @@ pipeline {
     deploy_project = "userxx-development"
     app_name = 'pipeline-practice-java'
     app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
+    JAVA_HOME = """${sh(
+                returnStdout: true,
+                script: 'alternatives --list | grep "java_sdk_1.8.0\\s" | awk \'{print $3}\''
+            )}"""
   }
 
   stages {
     stage('Setup') {
       steps {
         sh 'java -version'
-        //sh 'export JAVA_HOME=`alternatives --list | grep "java_sdk_1.8.0\s" | awk "{print $3}"`'
+        sh 'echo $JAVA_HOME'
         sh 'mvn -v'
         sh 'mvn clean package -DskipTests'
       }
