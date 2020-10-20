@@ -10,7 +10,7 @@ pipeline {
 
   environment {
     deploy_branch = "origin/master"
-    deploy_project = "userxx-development"
+    deploy_project = "app-development"
     app_name = 'pipeline-practice-java'
     app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
   }

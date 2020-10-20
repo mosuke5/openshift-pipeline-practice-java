@@ -9,6 +9,8 @@ $ oc new-project app-development
 $ oc new-project app-devops
 ```
 
+さらに、[Jenkinsfile]の`pipeline.environment.deploy_project`を、`app-development`とする必要あり。
+
 ## Jenkins起動
 Jenkinsを起動する。Jenkinsは動作が重いため、必要に応じて`resource`を調整してください。
 また、Jenkinsはのちに`app-development`のリソースを操作するために権限を付与しておく。
@@ -49,6 +51,7 @@ Jenkins側の設定をいくつか行う。
 - アップデート
     - kubernetes
     - Pipeline: declarative
+    - Git
 - インストール
     - generic webhook
 
