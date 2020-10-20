@@ -9,6 +9,8 @@ $ oc new-project app-development
 $ oc new-project app-devops
 ```
 
+さらに、[Jenkinsfile](./Jenkinsfile)の13行目を`deploy_project`を、`app-development`に変更する。
+
 ## Jenkins起動
 Jenkinsを起動する。Jenkinsは動作が重いため、必要に応じて`resource`を調整してください。
 また、Jenkinsはのちに`app-development`のリソースを操作するために権限を付与しておく。
@@ -22,6 +24,23 @@ $ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2
 
 $ oc policy add-role-to-user edit system:serviceaccount:app-devops:jenkins -n app-development
 clusterrole.rbac.authorization.k8s.io/edit added: "system:serviceaccount:app-devops:jenkins"
+```
+
+なお、上記の設定でもJenkinsの動作が重い場合は、DeploymentConfigを編集して、リソースの割り当てを変更できる。
+```
+oc edit deploymentconfigs.apps.openshift.io jenkins
+```
+```
+(設定例)
+...
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 4Gi
+...
 ```
 
 ## Slave imageの作成
@@ -38,6 +57,16 @@ imagestream.image.openshift.io/custom-jenkins-agent-maven created
 $ oc start-build custom-jenkins-agent-maven -n app-devops
 ```
 
+さらに[openshift/jenkins-slave-pod.yaml](./openshift/jenkins-slave-pod.yaml)の7行目で、`custom-jenkins-agent-maven`を指定する。
+```
+$ vim openshift/jenkins-slave-pod.yaml
+```
+```
+(変更前) image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent
+→
+(変更後) image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
+```
+
 ## Jenkinsの設定
 おそらく、上のSlave Imageを作っている間にJenkinsが起動したはずだ。
 Jenkins側の設定をいくつか行う。
@@ -49,6 +78,7 @@ Jenkins側の設定をいくつか行う。
 - アップデート
     - kubernetes
     - Pipeline: declarative
+    - Git
 - インストール
     - generic webhook
 
