@@ -19,7 +19,6 @@ pipeline {
     stage('Setup') {
       steps {
         sh 'java -version'
-        sh 'sleep 3600'
         //sh 'export JAVA_HOME=`alternatives --list | grep "java_sdk_1.8.0\s" | awk "{print $3}"`'
         sh 'mvn -v'
         sh 'mvn clean package -DskipTests'
