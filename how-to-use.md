@@ -9,7 +9,7 @@ $ oc new-project app-development
 $ oc new-project app-devops
 ```
 
-さらに、[Jenkinsfile](./Jenkinsfile)の`pipeline.environment.deploy_project`を、`app-development`とする必要あり。
+さらに、[Jenkinsfile](./Jenkinsfile)の13行目を`deploy_project`を、`app-development`に変更する。
 
 ## Jenkins起動
 Jenkinsを起動する。Jenkinsは動作が重いため、必要に応じて`resource`を調整してください。
@@ -40,14 +40,14 @@ imagestream.image.openshift.io/custom-jenkins-agent-maven created
 $ oc start-build custom-jenkins-agent-maven -n app-devops
 ```
 
-さらに、[openshift/jenkins-slave-pod.yaml](./openshift/jenkins-slave-pod.yaml)で、`custom-jenkins-agent-maven`を指定する。
+さらに[openshift/jenkins-slave-pod.yaml](./openshift/jenkins-slave-pod.yaml)の7行目で、`custom-jenkins-agent-maven`を指定する。
 ```
 $ vim openshift/jenkins-slave-pod.yaml
 ```
 ```
 (変更前) image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent
 →
-(変更後)image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
+(変更後) image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
 ```
 
 ## Jenkinsの設定
