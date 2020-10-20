@@ -19,6 +19,7 @@ pipeline {
     stage('Setup') {
       steps {
         sh 'java -version'
+        sh 'sleep 3600'
         sh 'mvn -v'
         sh 'mvn clean package -DskipTests'
       }
