@@ -128,7 +128,7 @@ pipeline {
                 sleep 5
               }
               // selenium test
-              sh "python src/test/selenium/sample.py ${url}"
+              sh "python src/test/selenium/sample.py ${url}/health"
             }
           }
         }
