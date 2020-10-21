@@ -13,6 +13,10 @@ pipeline {
     deploy_project = "userxx-development"
     app_name = 'pipeline-practice-java'
     app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
+    JAVA_HOME = """${sh(
+                returnStdout: true,
+                script: 'alternatives --list | grep "java_sdk_1.8.0\\s" | awk \'{print $3}\' | tr -d \'\\n\''
+            )}"""
   }
 
   stages {
@@ -109,8 +113,25 @@ pipeline {
       }
 
       steps {
-        echo "integration-test"
-        // TODO
+        echo "integration-test, e2e-test"
+        script {
+          openshift.withCluster() {
+            openshift.withProject("${deploy_project}") {
+              def dc = openshift.selector("route", "${app_name}").object()
+              def url = dc.spec.host
+              echo "${url}"
+              while (true) {
+                def app_status = sh(returnStdout: true, script: "curl ${url}/hello -o /dev/null -w '%{http_code}' -s").trim()
+                if(app_status == "200") {
+                  break;
+                }
+                sleep 5
+              }
+              // selenium test
+              sh "python src/test/selenium/sample.py http://${url}/health"
+            }
+          }
+        }
       }
     }
   }
