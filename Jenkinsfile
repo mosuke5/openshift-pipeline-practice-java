@@ -113,11 +113,25 @@ pipeline {
       }
 
       steps {
-        echo "integration-test"
-        // TODO
-
-        echo "e2e-test"
-        sh "python src/test/selenium/sample.py"
+        echo "integration-test, e2e-test"
+        script {
+          openshift.withCluster() {
+            openshift.withProject("${deploy_project}") {
+              def dc = openshift.selector("route", "${app_name}").object()
+              def url = dc.spec.host
+              echo "${url}"
+              while (true) {
+                def app_status = sh(returnStdout: true, script: "curl ${url}/hello -o /dev/null -w '%{http_code}' -s").trim()
+                if(app_status == "200") {
+                  break;
+                }
+                sleep 5
+              }
+              // selenium test
+              sh "python src/test/selenium/sample.py ${url}"
+            }
+          }
+        }
       }
     }
   }
