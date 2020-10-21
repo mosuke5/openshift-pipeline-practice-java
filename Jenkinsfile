@@ -9,7 +9,7 @@ pipeline {
   }
 
   environment {
-    deploy_branch = "origin/master"
+    deploy_branch = "origin/add/selenium-test"
     deploy_project = "userxx-development"
     app_name = 'pipeline-practice-java'
     app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
@@ -115,6 +115,9 @@ pipeline {
       steps {
         echo "integration-test"
         // TODO
+
+        echo "e2e-test"
+        sh "python src/test/selenium/sample.py"
       }
     }
   }
