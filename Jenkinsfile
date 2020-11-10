@@ -42,6 +42,10 @@ pipeline {
             echo "Exec unit test"
             sh 'PGPASSWORD=password psql -U freelancer -d freelancerdb_test -h localhost -f etc/testdata.sql'
             sh 'mvn test'
+            junit allowEmptyResults: true,
+                  keepLongStdio: true,
+                  healthScaleFactor: 2.0,
+                  testResults: '**/target/surefire-reports/TEST-*.xml'
           }
         }
       }
