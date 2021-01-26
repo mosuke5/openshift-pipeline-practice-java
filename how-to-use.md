@@ -1,19 +1,18 @@
 # Getting started
 ## project作成
 OpenShiftのprojectを2つつくる。
-`app-development`がサンプルのアプリケーションが動作するprojectで、`app-devops`はJenkinsが動作するprojectである。
+`userxx-development`がサンプルのアプリケーションが動作するprojectで、`app-devops`はJenkinsが動作するprojectである。
 アプリケーションが動作するために必要なリソースを確保しておくため、アプリケーションが動作するprojectと開発に必要なツールは分離しておくことをおすすめする。
 
 ```
-$ oc new-project app-development
+$ oc new-project userxx-development
 $ oc new-project app-devops
 ```
 
-さらに、[Jenkinsfile](./Jenkinsfile)の13行目を`deploy_project`を、`app-development`に変更する。
-
 ## Jenkins起動
-Jenkinsを起動する。Jenkinsは動作が重いため、必要に応じて`resource`を調整してください。
-また、Jenkinsはのちに`app-development`のリソースを操作するために権限を付与しておく。
+Jenkinsを起動する。Jenkinsは動作が重いため、必要に応じて`resource`を調整する。
+また、Jenkinsはのちに`userxx-development`のリソースを操作するために権限を付与しておく。
+カスタムJenkinsを作成し、管理したい場合は[こちらのレポジトリ](https://github.com/mosuke5/openshift-custom-jenkins)を参考にしてJenkinsの起動を行う。
 
 ```
 $ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=10Gi --param DISABLE_ADMINISTRATIVE_MONITORS=true
@@ -22,13 +21,13 @@ $ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2
     Access your application via route 'jenkins-app-devops.apps.na311.openshift.opentlc.com'
     Run 'oc status' to view your app.
 
-$ oc policy add-role-to-user edit system:serviceaccount:app-devops:jenkins -n app-development
+$ oc policy add-role-to-user edit system:serviceaccount:app-devops:jenkins -n userxx-development
 clusterrole.rbac.authorization.k8s.io/edit added: "system:serviceaccount:app-devops:jenkins"
 ```
 
 なお、上記の設定でもJenkinsの動作が重い場合は、DeploymentConfigを編集して、リソースの割り当てを変更できる。
 ```
-oc edit deploymentconfigs.apps.openshift.io jenkins
+$ oc edit deploymentconfigs.apps.openshift.io jenkins
 ```
 ```
 (設定例)
@@ -43,9 +42,9 @@ oc edit deploymentconfigs.apps.openshift.io jenkins
 ...
 ```
 
-## Slave imageの作成
-Jenkinsパイプラインを実際に動作させるJenkins slaveのイメージを作成する。
-`jenkins-agent-maven`をベースとしながら、テストに必要なpostgresqlのクライアントをインストールしたJenkins Slaveを作成する。
+## Jenkins agent imageの作成
+Jenkinsパイプラインを実際に動作させるJenkins agentのイメージを作成する。
+`jenkins-agent-maven`をベースとしながら、テストに必要なpostgresqlのクライアントをインストールしたJenkins agentを作成する。
 作成方法は、Dockerfileからビルドする。
 
 ```
@@ -57,37 +56,53 @@ imagestream.image.openshift.io/custom-jenkins-agent-maven created
 $ oc start-build custom-jenkins-agent-maven -n app-devops
 ```
 
-さらに[openshift/jenkins-slave-pod.yaml](./openshift/jenkins-slave-pod.yaml)の7行目で、`custom-jenkins-agent-maven`を指定する。
+[openshift/jenkins-agent-pod.yaml](./openshift/jenkins-agent-pod.yaml)の7行目で、`custom-jenkins-agent-maven`を指定されていることを確認する。`jenkins-agent-pod.yaml`はJenkinsパイプラインを実行するPodの定義ファイルのこと。
+
 ```
-$ vim openshift/jenkins-slave-pod.yaml
-```
-```
-(変更前) image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent
-→
-(変更後) image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
+$ cat openshift/jenkins-agent-pod.yaml
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  containers:
+    - name: jnlp
+      image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
+      args: ['$(JENKINS_SECRET)', '$(JENKINS_NAME)']
+      tty: false
+...
 ```
 
 ## Jenkinsの設定
-おそらく、上のSlave Imageを作っている間にJenkinsが起動したはずだ。
+おそらく、上のJenkins agent imageを作っている間にJenkinsが起動したはずだ。
 Jenkins側の設定をいくつか行う。
 
+### Jenkinsへのアクセス
+Jenkinsをテンプレートから起動しているため、routeが作成されている。
+このURLからJenkinsへアクセス可能。ログインはOpenShiftのUserと連携しているのでユーザ管理が不要。
+
+```
+$ oc get route
+NAME      HOST/PORT                      PATH   SERVICES   PORT    TERMINATION     WILDCARD
+jenkins   jenkins-app-devops.apps.xxxx          jenkins    <all>   edge/Redirect   None
+```
+
 ### プラグイン
-本サンプルで利用する、Jekinsfileの記述ではデフォルのプラグインでは古く動作しないためアップデートを行う。
-また、Webhookを簡単に利用できるようにするために新規にプラグインをインストールする。
+本サンプルで利用するJekinsfileの記述ではOpenShiftのバージョンによってはデフォルトプラグインで動作しないためアップデートを行う。
+また、Webhook利用するため新規にgeneric webhookプラグインをインストールする。
 
 - アップデート
     - kubernetes
     - Pipeline: declarative
     - Git
 - インストール
-    - generic webhook
+    - Generic Webhook Trigger
 
 ### プロジェクト
 プラグインのアップデートとインストールが終わったら、アプリケーションのパイプラインを実行するためにJenkins Itemを作成する。
 
 1. "New Item"を選択
 1. Itemの種類は"Pipeline"を選択し、任意の名前をつける
-1. "Build Triggers"項目で"Generic Webhook Trigger"にチェックを付け下記を設定する
+1. "Build Triggers"項目で"Generic Webhook Trigger"にチェックを付け下記を設定する（手動で実行する場合は設定しなくてもいい）
     - token: 任意の文字列
 1. "Pipeline"の項目で実行するパイプライン定義を設定する
     - "pipeline script from SCM"を選択
@@ -123,7 +138,7 @@ URLは`https://xxxxxxxxxxxx/health` or `https://xxxxxxxxxxxx/freelancers`
 OpenShift内にシークレットとしてキーを登録する。`builder`から利用できるようにする。
 
 ```
-$ oc create secret generic git-repo-key -n app-development --from-file=ssh-privatekey=/path/tp/id_rsa
+$ oc create secret generic git-repo-key -n userxx-development --from-file=ssh-privatekey=/path/tp/id_rsa
 $ oc secrets link builder git-repo-key
 ```
 
@@ -157,17 +172,17 @@ BuildConfigのJenkinspipelineはdeprecatedなので、気にしなくて良い�
 パイプライン上のテストでDBなど外部リソースを使いたい場合は、サイドカーとしてDBのコンテナを立ち上げるとよい。
 JenkinsのKubernetes Pod templateの設定で複数のコンテナを指定できる。例えばそこで、メインのjnlpと別にmysqlコンテナを起動しておけばいい。
 
-実際に下記のように、slave podはコンテナ２つで起動する。
+実際に下記のように、Jenkins agent podはコンテナ２つで起動する。
 
 ```
-jenkins-slave-ruby-rmmhh   2/2       Running   0         35s
+test-pipeline-1-nffqh-xkxl0-ftjrd   2/2       Running   0         35s
 ```
 
-## Jenkins Slaveのコンテナイメージをカスタマイズしたい
-デフォルトではmavenとnodejsの環境のみJenkins Slaveのイメージが用意されている。
-独自のアプリケーションが動作する環境を作るためにはJenkins Slaveのコンテナイメージをカスタマイズする必要がある。
-以下のレポジトリのJenkins Slaveの例をベースにするとカスタマイズすると楽。  
+## Jenkins agentのコンテナイメージをカスタマイズしたい
+デフォルトではmavenとnodejsの環境のみJenkins agentのイメージが用意されている。
+独自のアプリケーションが動作する環境を作るためにはJenkins agentのコンテナイメージをカスタマイズする必要がある。
+以下のレポジトリのJenkins agentの例をベースにするとカスタマイズすると楽。  
 https://github.com/redhat-cop/containers-quickstarts/
 
-以下に、jenkins slaveのベースイメージもあるので、こちらを元にカスタマイズすることもできる。  
+以下に、jenkins agentのベースイメージもあるので、こちらを元にカスタマイズすることもできる。  
 https://quay.io/repository/openshift/origin-jenkins-agent-base?tab=tags
