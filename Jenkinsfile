@@ -4,7 +4,7 @@ pipeline {
   agent {
     kubernetes {
       cloud 'openshift'
-      yamlFile 'openshift/jenkins-slave-pod.yaml'
+      yamlFile 'openshift/jenkins-agent-pod.yaml'
     }
   }
 
