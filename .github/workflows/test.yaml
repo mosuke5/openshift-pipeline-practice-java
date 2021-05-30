@@ -9,9 +9,16 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:12
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: freelancerdb_test
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -19,6 +26,10 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
+    - name: Install postgresql client
+      run: apt-get install -y postgresql
+    - name: Set up test data
+      run: PGPASSWORD=password psql -U postgres -d freelancerdb_test -h localhost -f etc/testdata.sql
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
