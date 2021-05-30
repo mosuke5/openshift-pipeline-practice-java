@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11']
     services:
       postgres:
         image: postgres:12
@@ -20,10 +23,10 @@ jobs:
           POSTGRES_DB: freelancerdb_test
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 11
+    - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
+        java-version: ${{ matrix.java }}
         distribution: 'adopt'
     - name: Install postgresql client
       run: sudo apt-get update && sudo apt-get install -y postgresql
