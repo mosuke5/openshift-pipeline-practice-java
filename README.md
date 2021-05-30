@@ -1,3 +1,5 @@
+[![Java CI with Maven](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml/badge.svg)](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml)
+
 Pipeline practice sample.  
 Implementation: Spring Boot, PostgreSQL
 
