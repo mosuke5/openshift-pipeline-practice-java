@@ -27,7 +27,7 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Install postgresql client
-      run: apt-get update && apt-get install -y postgresql
+      run: sudo apt-get update && sudo apt-get install -y postgresql
     - name: Set up test data
       run: PGPASSWORD=password psql -U postgres -d freelancerdb_test -h localhost -f etc/testdata.sql
     - name: Build with Maven
