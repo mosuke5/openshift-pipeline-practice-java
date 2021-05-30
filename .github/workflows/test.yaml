@@ -11,11 +11,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     services:
-      # Label used to access the service container
-      postgres:
-        # Docker Hub image
         image: postgres:12
-        # Provide the password for postgres
+        ports:
+          - 5432:5432
         env:
           POSTGRES_PASSWORD: password
           POSTGRES_DB: freelancerdb_test
@@ -35,5 +33,6 @@ jobs:
       env:
         PG_HOST: postgres
         PG_USER: postgres
+        PG_PORT: 5432
         PG_PASSWORD: password
 
