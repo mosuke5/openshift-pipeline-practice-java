@@ -1,0 +1,36 @@
+name: Java CI with Maven
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11']
+    env:
+      PG_HOST: localhost
+      PG_USER: postgres
+      PG_PORT: 5432
+      PG_PASSWORD: password
+      PG_DB: freelancerdb_test
+    services:
+      postgres:
+        image: postgres:12
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: freelancerdb_test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+      - name: Install postgresql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql
+      - name: Set up test data
+        run: PGPASSWORD=$PG_PASSWORD psql -U $PG_USER -d $PG_DB -h $PG_HOST -f etc/testdata.sql
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
