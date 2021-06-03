@@ -156,8 +156,8 @@ pipeline {
                 }
                 sleep 5
               }
-              // selenium test
-              sh "python src/test/selenium/sample.py http://${url}/health"
+
+              // 任意のインテグレーションテストを実装
             }
           }
         }
