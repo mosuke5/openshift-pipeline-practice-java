@@ -1,25 +1,68 @@
 [![Java CI with Maven](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml/badge.svg)](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml)
 
-Pipeline practice sample.  
-Implementation: Spring Boot, PostgreSQL
+| 項目 | 対応ソフトウェア・バージョン |
+:-----------|:------------|
+Implementation | Spring Boot, PostgreSQL |
+Java version | 8, 11 (CIでテスト済み) |
+PostgreSQL version | 12 |
+動作確認したOpenShiftバージョン | 4.6, 4.7 |
 
 ![overview](images/freelancer-overview.png)
 
+## ファイルの説明
+
+| ファイル | 説明 |
+:-----------|:------------|
+`Jenkinsfile` | Jenkinsのパイプラインの実行定義 |
+`etc/Dockerfile_jenkins_agent` | カスタムのJenkins agentを作成するためのDockerfile |
+`etc/testdata.sql` | アプリケーションがテストに利用するテストデータ|
+`openshift/application-build.yaml` | アプリケーションコンテナイメージの作成に必要なBuildConfigなどのマニフェストファイル |
+`openshift/application-deploy.yaml` | アプリケーションをデプロイするためのマニフェストファイル|
+`openshift/custom-jenkins-agent.yaml` | カスタムのJenkins agentを作成するために利用するBuildConfigなどのマニフェストファイル|
+`pox.xml` | アプリケーションの依存ライブラリ等を記述したファイル|
+`src/*` | アプリケーションのコード|
+
 ## How to develop on local device
+
 ```
+// Java version
+$ java -version
+java version "1.8.0_211"
+Java(TM) SE Runtime Environment (build 1.8.0_211-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.211-b12, mixed mode)
+
+$ mvn -version
+Apache Maven 3.6.3 (cecedd343002696d0abb50b32b541b8a6ba2883f)
+Maven home: /usr/local/Cellar/maven/3.6.3_1/libexec
+Java version: 1.8.0_211, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home/jre
+Default locale: ja_JP, platform encoding: UTF-8
+OS name: "mac os x", version: "10.16", arch: "x86_64", family: "mac"
+
 // Start PostgreSQL with Docker
-$ docker run --name my-pg -e POSTGRES_PASSWORD=password -e POSTGRES_DB=freelancerdb_test -d -p 5432:5432 postgres:9.4
+$ docker run --name my-pg -e POSTGRES_USER=freelancer -e POSTGRES_PASSWORD=password -e POSTGRES_DB=freelancerdb_test -d -p 5432:5432 postgres:12
 
 // Connect PostgreSQL and load data
 // You can load test data by using etc/testdata.sql
-$ docker run -it --rm --link my-pg:db postgres:9.4 psql -h db -U postgres -d freelancerdb_test
-postgres=# CREATE TABLE freelancer (freelancer_id character varying(255) PRIMARY KEY, first_name character varying(255), last_name character varying(255), email character varying(255), skills text[]);
-postgres=# INSERT INTO freelancer (freelancer_id, first_name, last_name, email, skills) values ('1', 'Ken', 'Yasuda', 'ken.yasuda@example.com', '{ "ruby", "php", "mysql"}');
-postgres=# INSERT INTO freelancer (freelancer_id, first_name, last_name, email, skills) values ('2', 'Tadashi', 'Komiya', 'tadashi.komiya@example.com', '{ "c#", "windows", "sqlserver"}');
-postgres=# INSERT INTO freelancer (freelancer_id, first_name, last_name, email, skills) values ('3', 'Taro', 'Goto', 'taro.goto@example.com', '{ "ruby", "postgresql", "java"}');
+$ psql -f etc/testdata.sql -h localhost -U freelancer -d freelancerdb_test
+Password for user postgres:
+CREATE TABLE
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
 
 // Test
 $ mvn clean test
+...
+Results :
+
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  38.428 s
+[INFO] Finished at: 2021-05-31T00:04:59+09:00
+[INFO] ------------------------------------------------------------------------
 ```
 
 ## Functions
