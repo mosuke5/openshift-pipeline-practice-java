@@ -3,15 +3,12 @@ FROM image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-ma
 
 ENV CHROME_URL https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 ENV EPEL_URL https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+ENV PGDG_REPO_URL https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 USER root
 
-# todo
-COPY /etc/centos.repo /etc/yum.repos.d/centos.repo
-
 # install dependenct packages for postgresql, selenium...
-RUN yum install -y ${EPEL_URL} \
-    && yum install -y postgresql skopeo chromedriver ipa-pgothic-fonts.noarch python-pip \
-    && yum install -y  ${CHROME_URL} \
+RUN yum install -y ${EPEL_URL} ${PGDG_REPO_URL} ${CHROME_URL} \
+    && yum install -y postgresql chromedriver ipa-pgothic-fonts.noarch python-pip \
     && rm -rf /var/tmp/*
 RUN pip install selenium
 USER 1001
