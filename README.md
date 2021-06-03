@@ -1,9 +1,11 @@
 [![Java CI with Maven](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml/badge.svg)](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml)
 
-Pipeline practice sample.  
-Implementation: Spring Boot, PostgreSQL  
-Java version: 8, 11
-PostgreSQL version: 12
+| 項目 | 対応ソフトウェア・バージョン |
+:-----------|:------------|
+Implementation | Spring Boot, PostgreSQL |
+Java version | 8, 11 (CIでテスト済み) |
+PostgreSQL version | 12 |
+動作確認したOpenShiftバージョン | 4.6, 4.7 |
 
 ![overview](images/freelancer-overview.png)
 
