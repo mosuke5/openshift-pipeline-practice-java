@@ -11,7 +11,7 @@ pipeline {
           serviceAccountName: jenkins
           containers:
             - name: jnlp
-              image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent
+              image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
               args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
             - name: postgres
               image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:12
