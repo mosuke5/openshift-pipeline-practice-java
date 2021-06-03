@@ -1,4 +1,4 @@
-# Getting started
+# Jenkinsパイプラインの動かし方
 ## project作成
 OpenShiftのprojectを2つ作成する。
 `userxx-development`がサンプルのアプリケーションが動作するprojectで、`app-devops`はJenkinsが動作するprojectである。
