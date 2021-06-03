@@ -51,7 +51,7 @@ pipeline {
       }
     }
 
-    stage('application test') {
+    stage('Application test') {
       parallel {
         stage('Code analysis') {
           steps {
@@ -60,7 +60,7 @@ pipeline {
           }
         }
 
-        stage('unit test') {
+        stage('Unit test') {
           steps {
             echo "Exec unit test"
             sh 'PGPASSWORD=password psql -U freelancer -d freelancerdb_test -h localhost -f etc/testdata.sql'
@@ -103,7 +103,7 @@ pipeline {
 
     }
 
-    stage('deploy') {
+    stage('Deploy application') {
       when {
         expression {
           return env.GIT_BRANCH == "${deploy_branch}" || params.FORCE_FULL_BUILD
@@ -134,7 +134,7 @@ pipeline {
       }
     }
 
-    stage('integration-test') {
+    stage('Integration test') {
       when {
         expression {
           return env.GIT_BRANCH == "${deploy_branch}" || params.FORCE_FULL_BUILD
