@@ -1,6 +1,6 @@
 # Getting started
 ## project作成
-OpenShiftのprojectを2つつくる。
+OpenShiftのprojectを2つ作成する。
 `userxx-development`がサンプルのアプリケーションが動作するprojectで、`app-devops`はJenkinsが動作するprojectである。
 アプリケーションが動作するために必要なリソースを確保しておくため、アプリケーションが動作するprojectと開発に必要なツールは分離しておくことをおすすめする。
 
@@ -56,19 +56,23 @@ imagestream.image.openshift.io/custom-jenkins-agent-maven created
 $ oc start-build custom-jenkins-agent-maven -n app-devops
 ```
 
-[openshift/jenkins-agent-pod.yaml](./openshift/jenkins-agent-pod.yaml)の7行目で、`custom-jenkins-agent-maven`を指定されていることを確認する。`jenkins-agent-pod.yaml`はJenkinsパイプラインを実行するPodの定義ファイルのこと。
+[Jenkinsfile](./Jenkinsfile)のagent設定にて、イメージ名に`custom-jenkins-agent-maven`を指定されていることを確認する。
 
 ```
-$ cat openshift/jenkins-agent-pod.yaml
-apiVersion: v1
-kind: Pod
-spec:
-  serviceAccountName: jenkins
-  containers:
-    - name: jnlp
-      image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
-      args: ['$(JENKINS_SECRET)', '$(JENKINS_NAME)']
-      tty: false
+$ cat Jenkinsfile
+...
+  agent {
+    kubernetes {
+      cloud 'openshift'
+      yaml """\
+        apiVersion: v1
+        kind: Pod
+        spec:
+          serviceAccountName: jenkins
+          containers:
+            - name: jnlp
+              image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
+              args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
 ...
 ```
 
@@ -87,15 +91,16 @@ jenkins   jenkins-app-devops.apps.xxxx          jenkins    <all>   edge/Redirect
 ```
 
 ### プラグイン
-本サンプルで利用するJekinsfileの記述ではOpenShiftのバージョンによってはデフォルトプラグインで動作しないためアップデートを行う。
-また、Webhook利用するため新規にgeneric webhookプラグインをインストールする。
+Webhook利用するため新規にgeneric webhookプラグインをインストールする。
+また、古いOpenShift（4.1など）を利用している場合、いくつかのデフォルトプラグインが古く動作しないことがあるので、アップデートも必要に応じて行う。
+また、サンプルのためGUIからプラグインをインストールするが、Jenkins設定をS2Iでビルドすることが可能。実運用ではS2Iでのビルドを検討する。
 
-- アップデート
+- インストール
+    - Generic Webhook Trigger
+- アップデート（必要に応じて）
     - kubernetes
     - Pipeline: declarative
     - Git
-- インストール
-    - Generic Webhook Trigger
 
 ### プロジェクト
 プラグインのアップデートとインストールが終わったら、アプリケーションのパイプラインを実行するためにJenkins Itemを作成する。
@@ -130,8 +135,10 @@ https://jenkins-app-devops.xxxxx.com/generic-webhook-trigger/invoke?token=<your-
 最後は起動したアプリケーションにブラウザから接続して確認してみよう。
 URLは`https://xxxxxxxxxxxx/health` or `https://xxxxxxxxxxxx/freelancers`
 
-# カスタマイズ
-## プライベートのGitレポジトリを扱いたい
+## カスタマイズ
+以下は、運用環境に合わせてカスタマイズできる項目の例。
+
+### プライベートのGitレポジトリを扱いたい
 プライベートのGitレポジトリで行う場合には、JenkinsとOpenShiftの両方にプライベートレポジトリにアクセス可能なキーを登録する必要がある。JenkinsではSCM内のJenkinsfile取得やチェックインで利用し、OpenShiftではBuildConfigでビルドする際のソースコードとして必要。
 
 ### BuildConfigでのプライベートレポジトリへのアクセス
@@ -158,7 +165,7 @@ BuildConfig内で上記のキーを利用するように指定する。
 Credentialを利用する。  
 https://jenkins.io/doc/book/using/using-credentials/
 
-## Jenkinsfileを書きたい
+### Jenkinsfileを書きたい
 Jenkins piplelineの記法は、DeclarativeとScriptの2つがある。
 どちらをベースに書くか意識することが必要。現在であればDeclarative記法をベースにすることが望ましい。
 
@@ -168,7 +175,7 @@ https://jenkins.io/doc/book/pipeline/syntax/
 ### BuildConfigのJenkinspipelineとどう使い分けたら良いの？
 BuildConfigのJenkinspipelineはdeprecatedなので、気にしなくて良い。
 
-## Jenkins パイプラインのテストで外部コンポーネントを使いたい
+### Jenkins パイプラインのテストで外部コンポーネントを使いたい
 パイプライン上のテストでDBなど外部リソースを使いたい場合は、サイドカーとしてDBのコンテナを立ち上げるとよい。
 JenkinsのKubernetes Pod templateの設定で複数のコンテナを指定できる。例えばそこで、メインのjnlpと別にmysqlコンテナを起動しておけばいい。
 
@@ -178,7 +185,7 @@ JenkinsのKubernetes Pod templateの設定で複数のコンテナを指定で�
 test-pipeline-1-nffqh-xkxl0-ftjrd   2/2       Running   0         35s
 ```
 
-## Jenkins agentのコンテナイメージをカスタマイズしたい
+### Jenkins agentのコンテナイメージをカスタマイズしたい
 デフォルトではmavenとnodejsの環境のみJenkins agentのイメージが用意されている。
 独自のアプリケーションが動作する環境を作るためにはJenkins agentのコンテナイメージをカスタマイズする必要がある。
 以下のレポジトリのJenkins agentの例をベースにするとカスタマイズすると楽。  
