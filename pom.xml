@@ -12,7 +12,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
     <version.cxf>3.2.0</version.cxf>
-    <version.spring-cloud-kubernetes>0.2.0.RELEASE</version.spring-cloud-kubernetes>
+    <version.spring-cloud-kubernetes>1.1.10.RELEASE</version.spring-cloud-kubernetes>
   </properties>
   <dependencyManagement>
     <dependencies>
