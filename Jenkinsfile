@@ -11,7 +11,7 @@ pipeline {
           serviceAccountName: jenkins
           containers:
             - name: jnlp
-              image: image-registry.openshift-image-registry.svc:5000/app-devops/jenkins-agent-maven
+              image: image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-maven
               args: ['\$(JENKINS_SECRET)', '\$(JENKINS_AGENT_NAME)']
         """.stripIndent()
     }
