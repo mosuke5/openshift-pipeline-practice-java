@@ -32,10 +32,6 @@ objects:
           name: 'ubi8-openjdk-11:1.12'
     source:
       type: binary
-      #type: Git
-      #git:
-      #  uri: "${SOURCE_REPOSITORY_URL}"
-      #  ref: "${SOURCE_REPOSITORY_REF}"
 - kind: ImageStream
   apiVersion: v1
   metadata:
@@ -53,13 +49,3 @@ parameters:
   required: true
   description: The OpenShift Namespace where the ImageStream resides.
   value: openshift
-- name: SOURCE_REPOSITORY_URL
-  displayName: Git Repository URL
-  required: true
-  description: The URL of the repository with your application source code.
-  value: https://github.com/mosuke5/openshift-pipeline-practice-java.git
-- name: SOURCE_REPOSITORY_REF
-  displayName: Git Reference
-  required: true
-  description: Set this to a branch name, tag or other ref of your repository if you are not using the default branch.
-  value: master

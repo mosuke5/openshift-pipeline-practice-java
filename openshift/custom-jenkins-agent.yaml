@@ -48,4 +48,4 @@ parameters:
 - name: SOURCE_REPOSITORY_REF
   displayName: Git Reference
   required: true
-  value: master
+  value: main

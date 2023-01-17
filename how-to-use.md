@@ -159,7 +159,7 @@ BuildConfig内で上記のキーを利用するように指定する。
     type: Git
     git:
       uri: 'git@github.com:xxxx/xxxx.git'
-      ref: master
+      ref: main
     sourceSecret:
       name: git-repo-key
 ```
