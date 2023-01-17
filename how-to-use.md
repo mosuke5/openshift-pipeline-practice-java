@@ -1,4 +1,7 @@
 # Jenkinsパイプラインの動かし方
+## 環境
+- OpenShift 4.11
+
 ## project作成
 OpenShiftのprojectを2つ作成する。
 `userxx-development`がサンプルのアプリケーションが動作するprojectで、`app-devops`はJenkinsが動作するprojectである。
@@ -92,12 +95,12 @@ jenkins   jenkins-app-devops.apps.xxxx          jenkins    <all>   edge/Redirect
 
 ### プラグイン
 Webhook利用するため新規にgeneric webhookプラグインをインストールする。
-また、古いOpenShift（4.1など）を利用している場合、いくつかのデフォルトプラグインが古く動作しないことがあるので、アップデートも必要に応じて行う。
+また、古いOpenShift（4.1など）を利用している場合、いくつかのデフォルトプラグインが古く動作しないことがあるが、4.8+では特別な対応は必要なく動作している。
 また、サンプルのためGUIからプラグインをインストールするが、Jenkins設定をS2Iでビルドすることが可能。実運用ではS2Iでのビルドを検討する。
 
 - インストール
     - Generic Webhook Trigger
-- アップデート（必要に応じて）
+- アップデート（古いOpenShift環境のみ）
     - kubernetes
     - Pipeline: declarative
     - Git

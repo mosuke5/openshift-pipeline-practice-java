@@ -4,8 +4,8 @@
 :-----------|:------------|
 Implementation | Spring Boot, PostgreSQL |
 Java version | 8, 11 (CIでテスト済み) |
-PostgreSQL version | 12 |
-動作確認したOpenShiftバージョン | 4.6, 4.7 |
+PostgreSQL version | 13 |
+動作確認したOpenShiftバージョン | 4.11 |
 
 ![overview](images/freelancer-overview.png)
 
@@ -39,7 +39,7 @@ Default locale: ja_JP, platform encoding: UTF-8
 OS name: "mac os x", version: "10.16", arch: "x86_64", family: "mac"
 
 // Start PostgreSQL with Docker
-$ docker run --name my-pg -e POSTGRES_USER=freelancer -e POSTGRES_PASSWORD=password -e POSTGRES_DB=freelancerdb_test -d -p 5432:5432 postgres:12
+$ docker run --name my-pg -e POSTGRES_USER=freelancer -e POSTGRES_PASSWORD=password -e POSTGRES_DB=freelancerdb_test -d -p 5432:5432 postgres:13
 
 // Connect PostgreSQL and load data
 // You can load test data by using etc/testdata.sql

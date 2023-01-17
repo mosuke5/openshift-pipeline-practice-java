@@ -1,6 +1,6 @@
 ---
 kind: Template
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 metadata:
   name: sample-spring-boot
 labels:
@@ -29,7 +29,7 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: "${NAMESPACE}"
-          name: 'redhat-openjdk18-openshift:1.2'
+          name: 'ubi8-openjdk-11:1.12'
     source:
       type: binary
       #type: Git

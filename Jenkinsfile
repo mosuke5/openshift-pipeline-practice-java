@@ -12,9 +12,9 @@ pipeline {
           containers:
             - name: jnlp
               image: image-registry.openshift-image-registry.svc:5000/app-devops/custom-jenkins-agent-maven
-              args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
+              args: ['\$(JENKINS_SECRET)', '\$(JENKINS_AGENT_NAME)']
             - name: postgres
-              image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:12
+              image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql:13-el8
               env:
                 - name: POSTGRESQL_USER
                   value: 'freelancer'
@@ -23,9 +23,6 @@ pipeline {
                 - name: POSTGRESQL_DATABASE
                   value: 'freelancerdb_test'
         """.stripIndent()
-      
-      // ファイルで読み込ませたい場合
-      //yamlFile 'xxxx.yaml'
     }
   }
 
