@@ -29,7 +29,7 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: "${NAMESPACE}"
-          name: 'redhat-openjdk18-openshift:1.12'
+          name: 'ubi8-openjdk-11:1.12'
     source:
       type: binary
       #type: Git
