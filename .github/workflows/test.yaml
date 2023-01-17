@@ -14,7 +14,7 @@ jobs:
       PG_DB: freelancerdb_test
     services:
       postgres:
-        image: postgres:12
+        image: postgres:13
         ports:
           - 5432:5432
         env:
