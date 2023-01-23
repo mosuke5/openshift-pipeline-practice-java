@@ -134,6 +134,30 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.8</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>prepare-agent</goal>
+                </goals>
+            </execution>
+            <execution>
+                <id>report</id>
+                <phase>test</phase>
+                <goals>
+                    <goal>report</goal>
+                </goals>
+                <configuration>
+                    <formats>
+                        <format>XML</format>
+                    </formats>
+                </configuration>
+            </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>
@@ -180,16 +204,6 @@
     <pluginRepository>
       <id>jboss-plugins</id>
       <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>redhat-techpreview</id>
-      <url>https://maven.repository.redhat.com/techpreview/all/</url>
       <releases>
         <enabled>true</enabled>
       </releases>
