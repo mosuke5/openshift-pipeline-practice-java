@@ -13,3 +13,18 @@ $ helm upgrade --install -f etc/sonarqube.yaml -n app-devops sonarqube sonarqube
 ```
 
 ## プロジェクト作成
+
+
+
+```
+mvn test jacoco:report 
+cat target/site/jacoco/jacoco.xml
+```
+
+```
+mvn verify sonar:sonar -DskipTests=true \
+  -Dsonar.projectKey=userxx-app \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=xxxxx \
+  -Dsonar.qualitygate.wait=true
+```

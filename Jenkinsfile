@@ -31,6 +31,7 @@ pipeline {
     deploy_project = "userxx-development"
     app_name = 'pipeline-practice-java'
     app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
+    sonar_key = credentials('userxx-sonar-key')
 
     // Agent Pod内のJavaのバージョンを切り替える場合、alternativesから取得も可能 
     //JAVA_HOME = """${sh(
@@ -42,6 +43,7 @@ pipeline {
   stages {
     stage('Setup') {
       steps {
+        sh 'echo $sonar_key'
         sh 'java -version'
         sh 'mvn -v'
         sh 'mvn clean package -DskipTests'
@@ -49,27 +51,21 @@ pipeline {
     }
 
     stage('Application test') {
-      parallel {
-        stage('Code analysis') {
-          steps {
-            echo "Exec static analysis"
-            //sh 'mvn spotbugs:check'
-          }
-        }
+      steps {
+        echo "Exec unit test"
+        sh 'PGPASSWORD=password psql -U freelancer -d freelancerdb_test -h localhost -f etc/testdata.sql'
+        sh 'mvn test jacoco:report'
+      }
+    }
 
-        stage('Unit test') {
-          steps {
-            echo "Exec unit test"
-            sh 'PGPASSWORD=password psql -U freelancer -d freelancerdb_test -h localhost -f etc/testdata.sql'
-            sh 'mvn test'
-
-            // テスト結果のJenkinsへの保存
-            junit allowEmptyResults: true,
-                  keepLongStdio: true,
-                  healthScaleFactor: 2.0,
-                  testResults: '**/target/surefire-reports/TEST-*.xml'
-          }
-        }
+    stage('Analysis code') {
+      steps {
+        echo "Exec sonar scanner"
+        sh 'mvn verify sonar:sonar -DskipTests=true \
+              -Dsonar.projectKey=userxx-app \
+              -Dsonar.host.url=http://sonarqube-sonarqube.app-devops:9000 \
+              -Dsonar.login=$sonar_key \
+              -Dsonar.qualitygate.wait=true'
       }
     }
 
