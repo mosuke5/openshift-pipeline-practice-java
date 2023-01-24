@@ -27,11 +27,11 @@ pipeline {
   }
 
   environment {
-    deploy_branch = "origin/main"
+    deploy_branch  = "origin/main"
     deploy_project = "userxx-development"
-    app_name = 'pipeline-practice-java'
-    app_image = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
-    sonar_key = credentials('userxx-sonar-key')
+    app_name       = 'pipeline-practice-java'
+    app_image      = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
+    sonar_key      = credentials('common-sonar-key')
 
     // Agent Pod内のJavaのバージョンを切り替える場合、alternativesから取得も可能 
     //JAVA_HOME = """${sh(

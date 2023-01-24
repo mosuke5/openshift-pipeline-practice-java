@@ -164,29 +164,6 @@
   </profiles>
   <repositories>
     <repository>
-      <id>jboss</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>redhat-techpreview</id>
-      <name>Red Hat Tech Preview</name>
-      <url>https://maven.repository.redhat.com/techpreview/all/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
       <id>redhat-ga</id>
       <name>Red Hat GA</name>
       <url>https://maven.repository.redhat.com/ga/</url>
@@ -201,16 +178,6 @@
     </repository>
   </repositories>
   <pluginRepositories>
-    <pluginRepository>
-      <id>jboss-plugins</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
     <pluginRepository>
       <id>redhat-ga</id>
       <url>https://maven.repository.redhat.com/ga/</url>
