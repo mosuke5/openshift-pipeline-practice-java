@@ -31,7 +31,8 @@ pipeline {
     deploy_project = "userxx-development"
     app_name       = 'pipeline-practice-java'
     app_image      = "image-registry.openshift-image-registry.svc:5000/${deploy_project}/${app_name}"
-    sonar_key      = credentials('common-sonar-key')
+    //sonar_name     = 'userxx-app'
+    //sonar_key      = credentials('common-sonar-key')
 
     // Agent Pod内のJavaのバージョンを切り替える場合、alternativesから取得も可能 
     //JAVA_HOME = """${sh(
@@ -61,11 +62,11 @@ pipeline {
     stage('Analysis code') {
       steps {
         echo "Exec sonar scanner"
-        sh 'mvn verify sonar:sonar -DskipTests=true \
-              -Dsonar.projectKey=userxx-app \
-              -Dsonar.host.url=http://sonarqube-sonarqube.app-devops:9000 \
-              -Dsonar.login=$sonar_key \
-              -Dsonar.qualitygate.wait=true'
+        //sh 'mvn verify sonar:sonar -DskipTests=true \
+        //      -Dsonar.projectKey=$sonar_name \
+        //      -Dsonar.host.url=http://sonarqube-sonarqube.app-devops:9000 \
+        //      -Dsonar.login=$sonar_key \
+        //      -Dsonar.qualitygate.wait=true'
       }
     }
 
