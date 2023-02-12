@@ -12,7 +12,8 @@ $ helm repo update
 $ helm upgrade --install -f etc/sonarqube.yaml -n app-devops sonarqube sonarqube/sonarqube
 ```
 
-`common-sonar-key`という名前でSonarqubeにアクセスできる共通鍵をクレデンシャルストアに保管しておきます。
+`common-sonar-key`という名前でSonarqubeにアクセスできる共通鍵をクレデンシャルストアに保管しておきます。本来はプロジェクトごとのキーを使うが、ハンズオンのため共通の鍵を使う。
+Sonarqubeの `User > My Account > Security` から作成が可能。
 
 ## Sonarqubeにアクセス
 以下にアクセスしログインできるか確認しましょう。

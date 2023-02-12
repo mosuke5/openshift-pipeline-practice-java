@@ -44,7 +44,6 @@ pipeline {
   stages {
     stage('Setup') {
       steps {
-        sh 'echo $sonar_key'
         sh 'java -version'
         sh 'mvn -v'
         sh 'mvn clean package -DskipTests'
@@ -63,6 +62,7 @@ pipeline {
       steps {
         echo "Exec sonar scanner"
         //sh 'mvn verify sonar:sonar -DskipTests=true \
+        //      -Dsonar.projectName=$sonar_name \
         //      -Dsonar.projectKey=$sonar_name \
         //      -Dsonar.host.url=http://sonarqube-sonarqube.app-devops:9000 \
         //      -Dsonar.login=$sonar_key \
