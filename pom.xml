@@ -12,7 +12,6 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
     <version.cxf>3.2.0</version.cxf>
-    <version.spring-cloud-kubernetes>0.2.0.RELEASE</version.spring-cloud-kubernetes>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -50,11 +49,6 @@
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
     </dependency>    
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
-      <version>${version.spring-cloud-kubernetes}</version>
-    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-actuator</artifactId>
@@ -140,34 +134,35 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.8</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>prepare-agent</goal>
+                </goals>
+            </execution>
+            <execution>
+                <id>report</id>
+                <phase>test</phase>
+                <goals>
+                    <goal>report</goal>
+                </goals>
+                <configuration>
+                    <formats>
+                        <format>XML</format>
+                    </formats>
+                </configuration>
+            </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>
   </profiles>
   <repositories>
-    <repository>
-      <id>jboss</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>redhat-techpreview</id>
-      <name>Red Hat Tech Preview</name>
-      <url>https://maven.repository.redhat.com/techpreview/all/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
     <repository>
       <id>redhat-ga</id>
       <name>Red Hat GA</name>
@@ -183,26 +178,6 @@
     </repository>
   </repositories>
   <pluginRepositories>
-    <pluginRepository>
-      <id>jboss-plugins</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>redhat-techpreview</id>
-      <url>https://maven.repository.redhat.com/techpreview/all/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
     <pluginRepository>
       <id>redhat-ga</id>
       <url>https://maven.repository.redhat.com/ga/</url>

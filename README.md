@@ -1,3 +1,5 @@
+※本レポジトリは2023年3月末をもってメンテナンスを終了予定です。最新のOpenShift確認バージョンは4.11です。
+
 [![Java CI with Maven](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml/badge.svg)](https://github.com/mosuke5/openshift-pipeline-practice-java/actions/workflows/test.yaml)
 
 | 項目 | 対応ソフトウェア・バージョン |
