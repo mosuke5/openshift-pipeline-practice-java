@@ -10,7 +10,7 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
+    <version.spring-boot>2.1.4.RELEASE-redhat-00001</version.spring-boot>
     <version.cxf>3.2.0</version.cxf>
   </properties>
   <dependencyManagement>
